@@ -1,16 +1,28 @@
 __author__ = 'Mario'
 
-from pylab import rand,plot,show,norm
+from pylab import rand
+import numpy as np
 
 class Perceptron:
     def __init__(self, elements):
-        """ perceptron initialization """
-        self.w = rand(elements)*2-1 # weights
+        self.w = rand(elements)*2-1 # Sets random weights
         self.wLength = elements
-        self.learningRate = 0.05
+        self.learningRate = 0.05 # Set this to one for the naive Perceptron
+        self.y = [] # instantiate a y misclassified list
+        self.b =.0001
+
+    def updateWeights(self,x,iterError):
+        """
+           w(t+1) = w(t) + learningRate*(d-r)*x
+        """
+        for i in range(self.wLength):
+            self.w[i] += self.learningRate*iterError*x[i]
+
+    def updateWeightsBatchRelax(self, x, iterError):
+        for i in range(self.wLength):
+            self.w[i] += self.w[i] + self.learningRate*np.sum((self.b-np.transpose(self.w))/np.linalg.norm(self.y)**2 * self.y)
 
     def response(self,x):
-        """ perceptron output """
         y = 0
         for i in range(len(x)):
             y += x[i]*self.w[i]
@@ -19,21 +31,9 @@ class Perceptron:
         else:
             return -1
 
-    def updateWeights(self,x,iterError):
-        """
-        updates the weights status, w at time t+1 is
-           w(t+1) = w(t) + learningRate*(d-r)*x
-        where d is desired output and r the perceptron response
-        iterError is (d-r)
-        """
-        for i in range(self.wLength):
-            self.w[i] += self.learningRate*iterError*x[i]
-
     def train(self,data,index):
         """
-        trains all the vector in data.
-        Every vector in data must have three elements,
-        the third element (x[2]) must be the label (desired output)
+        This is the actual engine of the perceptron
         """
         learned = False
         iteration = 0
@@ -43,6 +43,7 @@ class Perceptron:
             for i in range(size): # for each sample
                 r = self.response(data[i])
                 if index[i] != r: # if we have a wrong response
+                    self.y.append(data[i])
                     iterError = index[i] - r # desired response - actual response
                     self.updateWeights(data[i],iterError)
                     globalError += abs(iterError)

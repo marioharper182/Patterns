@@ -6,19 +6,13 @@ from sklearn import datasets
 from sklearn.multiclass import OneVsRestClassifier, OneVsOneClassifier
 from sklearn.svm import LinearSVC
 from sklearn.datasets import load_digits
+from sklearn.linear_model import Perceptron as pla
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
 import pylab as pl
 from PerceptronBasic import Perceptron
 from pylab import norm
+from sklearn.ensemble import AdaBoostClassifier
 
-iris = datasets.load_iris()
-X, y = iris.data, iris.target
-OneVsOneClassifier(LinearSVC(random_state=0)).fit(X, y).predict(X)
-
-digits = load_digits()
-
-# pl.gray()
-# pl.matshow(digits.images[2])
-# pl.show()
 
 digitTraining = pd.read_table('./Data/zip_train_0_2.txt',delim_whitespace=True, header=None)
 digitTest = pd.read_table('./Data/zip_test_0_2.txt',delim_whitespace=True, header=None)
@@ -120,7 +114,43 @@ for j in range(3):
 n = norm(winePerceptronTrainer.w)
 ww = winePerceptronTrainer.w/n
 
+winePercep = pla(n_iter=5).fit(trainMatrix, indexTestClass3).predict(testMatrix)
+# print(winePercep)
 
+clf = QuadraticDiscriminantAnalysis()
+clf.fit(digitTrainingMatrix, indexDigitTraining)
+A = clf.predict(digitTestMatrix)
+
+failRateQuadratic = 0
+for i in range(len(A)):
+    if A[i] != indexDigitTest[i]:
+        failRateQuadratic += 1
+
+print "Number of misclassifications in the Quadratic is: ", failRateQuadratic
+print i
+
+from sklearn.cross_validation import cross_val_score, cross_val_predict
+clf = AdaBoostClassifier(n_estimators=50)
+scores = cross_val_score(clf, digitTrainingMatrix, indexDigitTraining)
+clf.fit(digitTrainingMatrix, indexDigitTraining)
+digitAdaBoost = clf.predict(digitTestMatrix)
+
+digitAdaFail = 0
+for i in range(len(digitAdaBoost)):
+    if digitAdaBoost[i] != indexDigitTest[i]:
+        digitAdaFail += 1
+print "Number of failures from AdaBoost on Digits Data is, ", digitAdaFail
+
+clf2 = AdaBoostClassifier()
+clf.fit(trainMatrix, index)
+wineAdaBoost = clf.predict(testMatrix)
+
+wineAdaFail = 0
+for i in range(len(wineAdaBoost)):
+    if wineAdaBoost[i] != indexTest[i]:
+        wineAdaFail += 1
+
+print "Number of failures from AdaBoost on Wine Data is: ", wineAdaFail
 
 # print errorInTest
 # print success
