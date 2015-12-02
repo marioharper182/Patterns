@@ -8,6 +8,7 @@ from sklearn.svm import LinearSVC
 from sklearn.datasets import load_digits
 import pylab as pl
 from PerceptronBasic import Perceptron
+from pylab import norm
 
 
 digits = load_digits()
@@ -28,6 +29,8 @@ digitIndexClass6 = [1 if i == 6 else 0 for i in digitsIndex]
 digitIndexClass7 = [1 if i == 7 else 0 for i in digitsIndex]
 digitIndexClass8 = [1 if i == 8 else 0 for i in digitsIndex]
 digitIndexClass9 = [1 if i == 9 else 0 for i in digitsIndex]
+
+
 
 # This loads and processes the wine data set into the OneVsRest Classifier
 dataTraining = pd.read_table('./Data/wine_uci_train.txt',delim_whitespace=True, header=None)
@@ -54,5 +57,36 @@ indexClass3 = [1 if i == 3 else 0 for i in index]
 winePerceptronTrainer = Perceptron(13)
 winePerceptronTrainer.train(trainMatrix, indexClass1)
 
+indexTestClass1 = [1 if i == 1 else 0 for i in index]
+indexTestClass2 = [1 if i == 2 else 0 for i in index]
+indexTestClass3 = [1 if i == 3 else 0 for i in index]
+indexTestClass = []
+# for j in range(1,4):
+#     indexTestClass.append([1 if i == j else 0 for i in index])
+indexTestClass.append(indexTestClass1)
+indexTestClass.append(indexTestClass2)
+indexTestClass.append(indexTestClass3)
+sizeTest = len(testMatrix)
+errorInTest = 0
+success = 0
+for j in range(3):
+    errorInTest = 0
+    success = 0
+    for i in range(sizeTest):
+        r = winePerceptronTrainer.response(testMatrix[i])
+        if r == indexTestClass[j][i]:
+            if indexTestClass[j][i] == 1:
+                success += 1
+            else:
+                errorInTest += 1
+    print success, errorInTest
+
+n = norm(winePerceptronTrainer.w)
+ww = winePerceptronTrainer.w/n
+
+
+
+# print errorInTest
+# print success
 
 print "Finished"

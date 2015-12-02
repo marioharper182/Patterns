@@ -38,7 +38,7 @@ class Perceptron:
         learned = False
         iteration = 0
         size = len(data)
-        while not learned or iteration <= 1000:
+        while not learned:
             globalError = 0.0
             for i in range(size): # for each sample
                 r = self.response(data[i])
@@ -48,7 +48,7 @@ class Perceptron:
                     globalError += abs(iterError)
                 iteration += 1
                 if globalError == 0.0 or iteration >= 100: # stop criteria
-                    print 'iterations',iteration
+                    # print 'iterations',iteration
                     learned = True # stop learning
 
 Perceptron(3)
