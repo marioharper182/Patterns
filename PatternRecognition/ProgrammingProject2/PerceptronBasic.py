@@ -7,7 +7,7 @@ class Perceptron:
         """ perceptron initialization """
         self.w = rand(elements)*2-1 # weights
         self.wLength = elements
-        self.learningRate = 0.1
+        self.learningRate = 0.05
 
     def response(self,x):
         """ perceptron output """
