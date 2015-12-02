@@ -17,19 +17,29 @@ digits = load_digits()
 # pl.matshow(digits.images[2])
 # pl.show()
 
-digitVariables, digitsIndex = digits.data, digits.target
-digitClassifier = OneVsRestClassifier(LinearSVC(random_state=0)).fit(digitVariables,digitsIndex).predict(digitVariables)
-digitIndexClass0 = [1 if i == 0 else 0 for i in digitsIndex]
-digitIndexClass1 = [1 if i == 1 else 0 for i in digitsIndex]
-digitIndexClass2 = [1 if i == 2 else 0 for i in digitsIndex]
-digitIndexClass3 = [1 if i == 3 else 0 for i in digitsIndex]
-digitIndexClass4 = [1 if i == 4 else 0 for i in digitsIndex]
-digitIndexClass5 = [1 if i == 5 else 0 for i in digitsIndex]
-digitIndexClass6 = [1 if i == 6 else 0 for i in digitsIndex]
-digitIndexClass7 = [1 if i == 7 else 0 for i in digitsIndex]
-digitIndexClass8 = [1 if i == 8 else 0 for i in digitsIndex]
-digitIndexClass9 = [1 if i == 9 else 0 for i in digitsIndex]
+digitTraining = pd.read_table('./Data/zip_train_0_2.txt',delim_whitespace=True, header=None)
+digitTest = pd.read_table('./Data/zip_test_0_2.txt',delim_whitespace=True, header=None)
 
+digitTrainingMatrix = digitTraining.as_matrix()
+indexDigitTraining = [i[0] for i in digitTrainingMatrix]
+digitTrainingMatrix = [np.delete(i,0) for i in digitTrainingMatrix]
+digitTestMatrix = digitTest.as_matrix()
+indexDigitTest = [i[0] for i in digitTestMatrix]
+digitTestMatrix = [np.delete(i,0) for i in digitTestMatrix]
+
+digitClassifier = OneVsRestClassifier(LinearSVC(random_state=0)).fit(digitTrainingMatrix,indexDigitTraining).predict(digitTestMatrix)
+# digitVariables, digitsIndex = digits.data, digits.target
+# digitClassifier = OneVsRestClassifier(LinearSVC(random_state=0)).fit(digitVariables,digitsIndex).predict(digitVariables)
+# digitIndexClass0 = [1 if i == 0 else 0 for i in digitsIndex]
+# digitIndexClass1 = [1 if i == 1 else 0 for i in digitsIndex]
+# digitIndexClass2 = [1 if i == 2 else 0 for i in digitsIndex]
+
+MissClassifiedDigitData = []
+for i in range(len(digitClassifier)):
+    if digitClassifier[i] != indexDigitTest[i]:
+        MissClassifiedDigitData.append(1)
+print("Number of missclassified Digits is:", np.sum(MissClassifiedDigitData))
+print("Number of correctly Classified Digits is:", len(digitClassifier) - np.sum(MissClassifiedDigitData))
 
 
 # This loads and processes the wine data set into the OneVsRest Classifier
@@ -49,7 +59,14 @@ testMatrix = dataTest.as_matrix()
 indexTest = [i[0] for i in testMatrix]
 testMatrix = [np.delete(i, 0) for i in testMatrix]
 
-wineClassifier = OneVsRestClassifier(LinearSVC(random_state=0)).fit(trainMatrix,index).predict(trainMatrix)
+wineClassifier = OneVsRestClassifier(LinearSVC(random_state=0)).fit(trainMatrix,index).predict(testMatrix)
+
+MissClassifiedWineData = []
+for i in range(len(wineClassifier)):
+    if wineClassifier[i] != indexTest[i]:
+        MissClassifiedWineData.append(1)
+print("Number of missclassified Wine Data is:", np.sum(MissClassifiedWineData))
+print("Number of correctly classified Wine Data is:", len(wineClassifier) - np.sum(MissClassifiedWineData))
 
 indexClass1 = [1 if i == 1 else 0 for i in index]
 indexClass2 = [1 if i == 2 else 0 for i in index]
@@ -79,7 +96,7 @@ for j in range(3):
                 success += 1
             else:
                 errorInTest += 1
-    print success, errorInTest
+    # print success, errorInTest
 
 n = norm(winePerceptronTrainer.w)
 ww = winePerceptronTrainer.w/n
